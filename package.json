@@ -9,7 +9,6 @@
     "seed": "npm run seed --prefix backend",
     "setup": "npm run install:all && npm run seed",
     "dev": "npm run dev:backend & npm run dev:frontend",
-    "build": "npm run build --prefix frontend && npm install --prefix backend",
     "start": "npm start --prefix backend"
   }
 }
