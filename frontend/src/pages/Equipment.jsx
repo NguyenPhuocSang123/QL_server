@@ -9,6 +9,8 @@ export default function Equipment() {
   const [equipment, setEquipment] = useState([]);
   const [borrowRecords, setBorrowRecords] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [workshops, setWorkshops] = useState([]);
+  const [productionLines, setProductionLines] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showReturnModal, setShowReturnModal] = useState(false);
@@ -18,13 +20,14 @@ export default function Equipment() {
   const [filterCategory, setFilterCategory] = useState('');
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [activeTab, setActiveTab] = useState('equipment'); // 'equipment' or 'borrow'
-  const [borrowModalType, setBorrowModalType] = useState(null); // 'use', 'install', 'borrow' or null
   const [showBorrowModal, setShowBorrowModal] = useState(false);
   const [borrowForm, setBorrowForm] = useState({
     borrowerName: '',
     quantity: 1,
     returnDate: '',
     notes: '',
+    workshop: '',
+    productionLine: '',
   });
 
   // Form states
@@ -43,6 +46,7 @@ export default function Equipment() {
 
   useEffect(() => {
     loadRooms();
+    loadWorkshops();
   }, []);
 
   useEffect(() => {
@@ -59,6 +63,15 @@ export default function Equipment() {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    // Load production lines when workshop is selected
+    if (borrowForm.workshop) {
+      loadProductionLines(borrowForm.workshop);
+    } else {
+      setProductionLines([]);
+    }
+  }, [borrowForm.workshop]);
+
   const loadEquipment = async () => {
     try {
       setLoading(true);
@@ -67,7 +80,7 @@ export default function Equipment() {
       if (filterCategory) params.append('category', filterCategory);
       if (onlyAvailable) params.append('onlyAvailable', 'true');
 
-      const response = await axios.get(`/equipment/equipment?${params}`);
+      const response = await axios.get(`/equipment?${params}`);
       setEquipment(response.data);
     } catch (error) {
       alert('Lỗi tải danh sách thiết bị: ' + error.message);
@@ -95,10 +108,30 @@ export default function Equipment() {
     }
   };
 
+  const loadWorkshops = async () => {
+    try {
+      const response = await axios.get('/workshops/workshops');
+      setWorkshops(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error('Lỗi tải danh sách xưởng:', error.response?.data || error.message);
+      setWorkshops([]);
+    }
+  };
+
+  const loadProductionLines = async (workshopId) => {
+    try {
+      const response = await axios.get(`/workshops/workshops/${workshopId}/lines`);
+      setProductionLines(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error('Lỗi tải danh sách chuyền:', error.response?.data || error.message);
+      setProductionLines([]);
+    }
+  };
+
   const handleAddEquipment = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/equipment/equipment', formData);
+      const response = await axios.post('/equipment', formData);
       setEquipment([response.data, ...equipment]);
       setShowAddModal(false);
       setFormData({
@@ -117,12 +150,13 @@ export default function Equipment() {
 
   const openBorrowModal = (item) => {
     setSelectedEquipment(item);
-    setBorrowModalType('use');
     setBorrowForm({
       borrowerName: user?.fullName || '',
       quantity: 1,
       returnDate: '',
       notes: '',
+      workshop: '',
+      productionLine: '',
     });
     setShowBorrowModal(true);
   };
@@ -133,12 +167,16 @@ export default function Equipment() {
       alert('Vui lòng chọn thiết bị');
       return;
     }
-    if (!borrowModalType) {
-      alert('Vui lòng chọn loại mượn');
+    if (!borrowForm.workshop) {
+      alert('Vui lòng chọn xưởng');
+      return;
+    }
+    if (!borrowForm.productionLine) {
+      alert('Vui lòng chọn chuyền');
       return;
     }
     if (!borrowForm.borrowerName.trim()) {
-      alert('Vui lòng nhập tên người mượn');
+      alert('Vui lòng nhập tên người sử dụng');
       return;
     }
     const qty = Number(borrowForm.quantity);
@@ -154,7 +192,9 @@ export default function Equipment() {
         quantity: qty,
         expectedReturnDate: borrowForm.returnDate || null,
         notes: borrowForm.notes,
-        usageType: borrowModalType,
+        usageType: 'use',
+        workshop: borrowForm.workshop,
+        productionLine: borrowForm.productionLine,
       });
 
       await loadBorrowRecords();
@@ -163,16 +203,17 @@ export default function Equipment() {
       // Đóng modal và reset form
       setShowBorrowModal(false);
       setSelectedEquipment(null);
-      setBorrowModalType(null);
       setBorrowForm({
         borrowerName: '',
         quantity: 1,
         returnDate: '',
         notes: '',
+        workshop: '',
+        productionLine: '',
       });
-      alert('Mượn thiết bị thành công');
+      alert('Sử dụng thiết bị đã được ghi nhận');
     } catch (error) {
-      console.error('Lỗi mượn:', error.response?.data || error.message);
+      console.error('Lỗi:', error.response?.data || error.message);
       alert('Lỗi: ' + (error.response?.data?.message || error.message));
     }
   };
@@ -372,7 +413,7 @@ export default function Equipment() {
                                   onClick={() => openBorrowModal(item)}
                                   style={{ backgroundColor: '#9C27B0' }}
                                 >
-                                  📋 Mượn
+                                  📋 Sử dụng
                                 </button>
                               </div>
                             </td>
@@ -432,7 +473,7 @@ export default function Equipment() {
                               onClick={() => openBorrowModal(item)}
                               style={{ backgroundColor: '#9C27B0' }}
                             >
-                              📋 Mượn
+                              📋 Sử dụng
                             </button>
                           </div>
                         </div>
@@ -658,8 +699,8 @@ export default function Equipment() {
         show={showBorrowModal}
         onClose={() => setShowBorrowModal(false)}
         onSubmit={handleBorrow}
-        title="📋 Mượn Thiết bị"
-        submitLabel="✓ Xác nhận Mượn"
+        title="📋 Sử dụng Thiết bị"
+        submitLabel="✓ Xác nhận Sử dụng"
       >
         {selectedEquipment && (
           <div className="info-box">
@@ -670,42 +711,49 @@ export default function Equipment() {
           </div>
         )}
         <div className="form-group">
-          <label>Loại Mượn *</label>
-          <div className="radio-group">
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="borrowType"
-                value="use"
-                checked={borrowModalType === 'use'}
-                onChange={() => setBorrowModalType('use')}
-              />
-              🖱️ Sử dụng nội bộ
-            </label>
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="borrowType"
-                value="install"
-                checked={borrowModalType === 'install'}
-                onChange={() => setBorrowModalType('install')}
-              />
-              🔧 Lắp cho phòng ban khác
-            </label>
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="borrowType"
-                value="borrow"
-                checked={borrowModalType === 'borrow'}
-                onChange={() => setBorrowModalType('borrow')}
-              />
-              📋 Mượn thông thường
-            </label>
-          </div>
+          <label>Xưởng *</label>
+          <select
+            value={borrowForm.workshop}
+            onChange={(e) =>
+              setBorrowForm({
+                ...borrowForm,
+                workshop: e.target.value,
+                productionLine: '',
+              })
+            }
+            required
+          >
+            <option value="">-- Chọn Xưởng --</option>
+            {workshops.map((w) => (
+              <option key={w._id} value={w._id}>
+                {w.workshopName}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="form-group">
-          <label>Tên Người Mượn *</label>
+          <label>Chuyền *</label>
+          <select
+            value={borrowForm.productionLine}
+            onChange={(e) =>
+              setBorrowForm({
+                ...borrowForm,
+                productionLine: e.target.value,
+              })
+            }
+            required
+            disabled={!borrowForm.workshop}
+          >
+            <option value="">-- Chọn Chuyền --</option>
+            {productionLines.map((line) => (
+              <option key={line._id} value={line._id}>
+                {line.lineName}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Tên Người Sử dụng *</label>
           <input
             type="text"
             value={borrowForm.borrowerName}
@@ -715,7 +763,7 @@ export default function Equipment() {
                 borrowerName: e.target.value,
               })
             }
-            placeholder="Nhập tên người mượn"
+            placeholder="Nhập tên người sử dụng"
             required
           />
         </div>

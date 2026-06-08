@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Chatbot from './Chatbot';
@@ -9,6 +10,7 @@ const navItems = [
   { to: '/racks', label: 'Tủ Rack', icon: '🗄️' },
   { to: '/network-devices', label: 'Thiết bị mạng', icon: '🌐' },
   { to: '/equipment', label: 'Thiết bị phòng', icon: '🖱️' },
+  { to: '/workshops', label: 'Xưởng & Chuyền', icon: '🏭', adminOnly: true },
   { to: '/maintenance', label: 'Bảo trì', icon: '🔧' },
   { to: '/incidents', label: 'Sự cố', icon: '⚠️' },
   { to: '/reports', label: 'Báo cáo', icon: '📈' },
@@ -19,15 +21,33 @@ const navItems = [
 export default function Layout() {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const closeSidebar = () => setSidebarOpen(false);
+
   return (
     <div className="app-layout">
-      <aside className="sidebar">
+      <button 
+        className="sidebar-toggle-btn"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label="Toggle sidebar"
+      >
+        ☰
+      </button>
+      {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <button 
+          className="sidebar-close-btn"
+          onClick={closeSidebar}
+          aria-label="Close sidebar"
+        >
+          ✕
+        </button>
         <div className="sidebar-brand">
           <span style={{ fontSize: '1.75rem' }}>🖧</span>
           <div>
@@ -39,7 +59,12 @@ export default function Layout() {
           {navItems
             .filter((item) => !item.adminOnly || isAdmin)
             .map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.to === '/'}>
+              <NavLink 
+                key={item.to} 
+                to={item.to} 
+                end={item.to === '/'}
+                onClick={closeSidebar}
+              >
                 <span>{item.icon}</span>
                 {item.label}
               </NavLink>

@@ -9,6 +9,8 @@ const NetworkDevice = require('./models/NetworkDevice');
 const Maintenance = require('./models/Maintenance');
 const Incident = require('./models/Incident');
 const Equipment = require('./models/Equipment');
+const Workshop = require('./models/Workshop');
+const ProductionLine = require('./models/ProductionLine');
 
 const seed = async () => {
   await connectDB();
@@ -21,6 +23,8 @@ const seed = async () => {
     Maintenance.deleteMany(),
     Incident.deleteMany(),
     Equipment.deleteMany(),
+    Workshop.deleteMany(),
+    ProductionLine.deleteMany(),
   ]);
 
   const admin = await User.create({
@@ -153,6 +157,31 @@ const seed = async () => {
     { server: srv3._id, reportedBy: tech._id, title: 'Server backup không phản hồi', description: 'Không ping được IP 192.168.1.12', severity: 'high', status: 'pending' },
     { server: srv2._id, reportedBy: tech._id, assignedTo: tech._id, title: 'Disk usage cao', description: 'Ổ cứng đạt 92% dung lượng', severity: 'medium', status: 'in_progress' },
   ]);
+
+  // Seed Workshops and Production Lines
+  const workshopA = await Workshop.create({ workshopName: 'A', description: 'Xưởng sản xuất A' });
+  const workshopB = await Workshop.create({ workshopName: 'B', description: 'Xưởng sản xuất B' });
+  const workshopC = await Workshop.create({ workshopName: 'C', description: 'Xưởng sản xuất C' });
+  const workshopD = await Workshop.create({ workshopName: 'D', description: 'Xưởng sản xuất D' });
+  const workshopE = await Workshop.create({ workshopName: 'E', description: 'Xưởng sản xuất E' });
+
+  // Create 16 production lines for each workshop
+  const workshops = [workshopA, workshopB, workshopC, workshopD, workshopE];
+  const productionLineData = [];
+
+  for (const workshop of workshops) {
+    for (let i = 1; i <= 16; i++) {
+      productionLineData.push({
+        workshop: workshop._id,
+        lineNumber: i,
+        lineName: `${workshop.workshopName}${i}`,
+        description: `Chuyền ${i} - Xưởng ${workshop.workshopName}`,
+        status: 'active',
+      });
+    }
+  }
+
+  await ProductionLine.create(productionLineData);
 
   console.log('Seed data created successfully!');
   console.log('--- Tài khoản đăng nhập ---');

@@ -31,6 +31,14 @@ const borrowRecordSchema = new mongoose.Schema(
       enum: ['use', 'install', 'borrow'],
       default: 'use',
     },
+    workshop: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Workshop',
+    },
+    productionLine: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ProductionLine',
+    },
     notes: { type: String, default: '' },
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,

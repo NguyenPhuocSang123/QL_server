@@ -24,7 +24,9 @@ app.use('/api/maintenance', require('./routes/maintenance'));
 app.use('/api/incidents', require('./routes/incidents'));
 app.use('/api/logs', require('./routes/logs'));
 app.use('/api/equipment', require('./routes/equipment'));
+app.use('/api/workshops', require('./routes/workshops'));
 app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/reports', require('./routes/reports'));
 app.use('/api/ai', require('./routes/ai'));
 
 // Phục vụ file tĩnh của frontend khi deploy lên production
@@ -42,4 +44,10 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  const localAddress = HOST === '0.0.0.0' ? 'localhost' : HOST;
+  console.log(`\n✅ Server running on:`);
+  console.log(`   Local: http://${localAddress}:${PORT}`);
+  console.log(`   Network: http://<YOUR_IP>:${PORT}\n`);
+});

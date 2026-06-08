@@ -14,6 +14,7 @@ import Reports from './pages/Reports';
 import Users from './pages/Users';
 import Logs from './pages/Logs';
 import Equipment from './pages/Equipment';
+import Workshops from './pages/Workshops';
 
 function App() {
   const { user, loading } = useAuth();
@@ -36,6 +37,7 @@ function App() {
         <Route path="racks" element={<Racks />} />
         <Route path="network-devices" element={<NetworkDevices />} />
         <Route path="equipment" element={<Equipment />} />
+        <Route path="workshops" element={<ProtectedRoute adminOnly><Workshops /></ProtectedRoute>} />
         <Route path="maintenance" element={<Maintenance />} />
         <Route path="incidents" element={<Incidents />} />
         <Route path="reports" element={<Reports />} />

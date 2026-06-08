@@ -32,6 +32,45 @@ a:hover { text-decoration: underline; }
 /* Layout */
 .app-layout { display: flex; min-height: 100vh; }
 
+.sidebar-toggle-btn {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem 0.75rem;
+  font-size: 1.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--bg-hover);
+}
+
+.sidebar-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+
 .sidebar {
   width: var(--sidebar-width);
   background: var(--bg-card);
@@ -41,6 +80,9 @@ a:hover { text-decoration: underline; }
   position: fixed;
   height: 100vh;
   z-index: 100;
+  left: 0;
+  top: 0;
+  transition: transform 0.3s ease;
 }
 
 .sidebar-brand {
@@ -86,6 +128,200 @@ a:hover { text-decoration: underline; }
   margin-left: var(--sidebar-width);
   padding: 1.5rem 2rem;
   min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 1.5rem 1rem;
+  }
+  
+  .page-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 260px;
+  }
+  
+  .sidebar-toggle-btn {
+    display: block;
+  }
+  
+  .sidebar-close-btn {
+    display: block;
+  }
+  
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .sidebar-overlay {
+    display: block;
+  }
+  
+  .sidebar-overlay.active {
+    display: block;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+    padding-top: 4rem;
+  }
+  
+  .page-header {
+    margin-bottom: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .page-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .page-header p {
+    font-size: 0.8rem;
+    margin-top: 0.1rem;
+  }
+  
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .stat-card .value {
+    font-size: 1.5rem;
+  }
+  
+  .stat-card .label {
+    font-size: 0.7rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+  
+  .search-bar {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .search-bar input,
+  .search-bar select {
+    width: 100%;
+  }
+  
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  table {
+    font-size: 0.8rem;
+  }
+  
+  th, td {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .ai-temp-stats {
+    gap: 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .ai-temp-item-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  
+  .ai-risk-badge {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar-toggle-btn {
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 1.25rem;
+  }
+  
+  .main-content {
+    padding: 0.75rem;
+    padding-top: 3.5rem;
+  }
+  
+  .page-header h2 {
+    font-size: 1rem;
+  }
+  
+  .page-header p {
+    font-size: 0.75rem;
+  }
+  
+  .stat-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .stat-card {
+    padding: 0.85rem;
+  }
+  
+  .stat-card .value {
+    font-size: 1.25rem;
+  }
+  
+  .stat-card .label {
+    font-size: 0.65rem;
+  }
+  
+  .card {
+    padding: 0.85rem;
+    border-radius: 8px;
+  }
+  
+  .btn {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.8rem;
+  }
+  
+  .modal {
+    padding: 1.25rem;
+  }
+  
+  .alert-item {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+  }
+  
+  .ai-temp-item {
+    padding: 0.65rem 0.85rem;
+  }
+  
+  .ai-temp-item-head strong {
+    font-size: 0.85rem;
+  }
 }
 
 .page-header {

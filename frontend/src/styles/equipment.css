@@ -13,6 +13,8 @@
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 2px solid #e0e0e0;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .equipment-header h1 {
@@ -24,6 +26,7 @@
 .tab-buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .tab-btn {
@@ -35,6 +38,7 @@
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .tab-btn:hover {
@@ -46,6 +50,63 @@
   background: #007bff;
   color: white;
   border-color: #007bff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .equipment-container {
+    padding: 12px;
+  }
+  
+  .equipment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    gap: 0.75rem;
+  }
+  
+  .equipment-header h1 {
+    font-size: 20px;
+  }
+  
+  .tab-buttons {
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: 70px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .equipment-container {
+    padding: 8px;
+  }
+  
+  .equipment-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+  }
+  
+  .equipment-header h1 {
+    font-size: 18px;
+  }
+  
+  .tab-buttons {
+    gap: 6px;
+  }
+  
+  .tab-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    min-width: 60px;
+  }
 }
 
 /* Controls Section */
